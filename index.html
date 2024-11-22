@@ -9,13 +9,13 @@
 <body>
     <h1>Online Excel File Viewer</h1>
     
-    <!-- Iframe for embedding the file -->
-    <iframe id="excelIframe" src="https://1drv.ms/x/c/d21c0adbb6f85e7f/EUq_kUAyIrBBi0tYEaOq9yYBweEtoRqH4SgYZeUbn1YjHw?e=NJgNGX" width="100%" height="400px" style="border: 1px solid #ccc;"></iframe>
+    <label for="fileUrl">Enter Excel File URL:</label>
+    <input type="text" id="fileUrl" placeholder="Paste the file URL here" style="width: 60%;" />
+    <button id="loadExcel">Load Excel Content</button>
     
-    <button id="loadExcel" style="margin-top: 10px;">Load and Display Excel Content</button>
     <div id="excelData" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
         <h3>Excel Content:</h3>
-        <pre id="excelContent"></pre>
+        <pre id="excelContent" style="white-space: pre-wrap;"></pre>
     </div>
 
     <script>
@@ -24,6 +24,9 @@
             try {
                 // Fetch the file as binary data
                 const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch the file. Status: ${response.status}`);
+                }
                 const arrayBuffer = await response.arrayBuffer();
 
                 // Parse the file using SheetJS
@@ -41,14 +44,18 @@
                 displayArea.textContent = JSON.stringify(jsonData, null, 2);
             } catch (error) {
                 console.error("Error loading Excel file:", error);
-                alert("Failed to load Excel file. Check the file URL and permissions.");
+                alert("Failed to load Excel file. Ensure the file URL is correct and publicly accessible.");
             }
         }
 
         // Attach event listener to button
         document.getElementById("loadExcel").addEventListener("click", () => {
-            const fileUrl = "https://1drv.ms/x/c/d21c0adbb6f85e7f/EUq_kUAyIrBBi0tYEaOq9yYBweEtoRqH4SgYZeUbn1YjHw?e=NJgNGX"; // Replace with your file URL
-            fetchAndDisplayExcel(fileUrl);
+            const fileUrl = document.getElementById("fileUrl").value.trim();
+            if (fileUrl) {
+                fetchAndDisplayExcel(fileUrl);
+            } else {
+                alert("Please enter a valid Excel file URL.");
+            }
         });
     </script>
 </body>
